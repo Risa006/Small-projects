@@ -1,6 +1,7 @@
 from pathlib import Path
 import tkinter as tk
 import os, subprocess, datetime, shlex
+from pprint import pprint
 from tkinter import messagebox
 
 class Paths:
@@ -39,15 +40,16 @@ class Funkce(Paths):
                 f.write(f"# Datum:\t\t{datetime.date.today()}\n")
                 f.write(f"# Verze:\t\t1.0\n")
                 f.write(f"# Autor:\t\tRichard Rutterle\n")
-                  
         if self.name[-3:] == ".py" or self.name[-4:] == ".pyw":
             self.project_file = f"{self.name}"
             self.project_directory = f"{self.project_directory}/{self.name[:-3]}" if self.name[-3:] == ".py" else f"{self.project_directory}/{self.name[:-4]}"
         else:
             self.project_file = f"{self.name}.py"
+        self.script_path = os.path.join(self.project_directory, self.project_file).replace("\\","/")
         # Open the project file in ide
         if self.ide:
-            subprocess.run(shlex.split(f"{self.ide} {os.path.join(self.project_directory, self.project_file).replace("\\","/")}"))
+            self.version()
+            subprocess.run(shlex.split(f"{self.ide} {self.script_path}"))
         else:
             messagebox.showwarning("IDE", "Vyber IDE")
         
@@ -65,10 +67,24 @@ class Funkce(Paths):
         match arg:
             case "Vscode":
                 self.ide = self.VSCode
-                print
             case "Idle":
                 self.ide = self.idle
         print(f"{self.ide = }")
+        
+    def version(self):
+        lines = []
+        with open(self.script_path, "r", encoding="UTF-8") as f:
+            for line in f :
+                lines.append(line.strip())
+            version = lines[5]
+            dot_index = version.find(".")+1 if version.find(".") !=-1 else version.find(".")
+            version_number = int(version[dot_index:])+1
+            version = version[:dot_index] + str(version_number)
+            lines[5] = version
+        with open(self.script_path,"w", encoding="UTF-8") as f:
+            for line in lines:
+                f.write(f"{line}\n")
+            
 f = Funkce()
 
 # Create the main window
@@ -114,7 +130,5 @@ button_list.pack(padx=2, pady=2)
 
 drop_dowm = tk.OptionMenu( root , ide , "Vscode", "Idle", command=f.change_ide) 
 drop_dowm.pack() 
-
-
 
 root.mainloop()
