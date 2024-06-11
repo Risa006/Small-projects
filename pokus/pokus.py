@@ -1,8 +1,7 @@
 # -*- coding: UTF-8 -*-
-# Program:		Blank.py
+# Program:		pokus.py
 # Zadání:		
 # URL zadání:		
 # Datum:		2024-05-29
-# Verze:		1.20
+# Verze:		1.11
 # Autor:		Richard Rutterle
-
